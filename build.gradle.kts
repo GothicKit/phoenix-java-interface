@@ -2,29 +2,26 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("java")
+    id("maven-publish")
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-group = "de.lmichaelis"
+group = "dev.gothickit"
 version = "1.0-SNAPSHOT"
 
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation("net.java.dev.jna:jna:5.13.0")
+    implementation("org.jetbrains:annotations:24.0.0")
 }
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
-}
-
-tasks.jar {
-    manifest {
-        attributes("Main-Class" to "de.lmichaelis.phoenix.Test")
-    }
 }
 
 tasks.withType<ShadowJar> {
@@ -32,3 +29,12 @@ tasks.withType<ShadowJar> {
     archiveClassifier.set("")
     archiveVersion.set("0.0.1")
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("shadow") {
+            project.shadow.component(this)
+        }
+    }
+}
+

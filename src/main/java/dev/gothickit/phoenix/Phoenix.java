@@ -2,14 +2,20 @@ package dev.gothickit.phoenix;
 
 import com.sun.jna.Native;
 
+import java.lang.ref.Cleaner;
+
 public class Phoenix {
+	public static final Cleaner CLEANER = Cleaner.create();
 	public static PhoenixNative API;
 
 	public static PhoenixNative load(String lib) {
-		return API = Native.load(lib, PhoenixNative.class);
+		return Native.load(lib, PhoenixNative.class);
 	}
 
 	public static PhoenixNative load() {
-		return API = Native.load("phoenix-shared", PhoenixNative.class);
+		if (API == null) {
+			API = Native.load("phoenix-shared", PhoenixNative.class);
+		}
+		return API;
 	}
 }

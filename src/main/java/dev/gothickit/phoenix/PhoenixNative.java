@@ -16,23 +16,23 @@ public interface PhoenixNative extends Library {
 
 	void pxBufferDestroy(PxBuffer buffer);
 
-	PxVdf pxVdfNew(String comment);
+	long pxBufferSize(PxBuffer buffer);
 
-	PxVdf pxVdfLoad(PxBuffer buffer);
+	Pointer pxBufferArray(PxBuffer buffer);
 
-	PxVdf pxVdfLoadFromFile(String file);
+	PxVfs pxVfsNew();
 
-	void pxVdfDestroy(PxVdf vdf);
+	PxVfs pxVfsMountDisk(PxVfs vfs, String path);
 
-	void pxVdfMerge(PxVdf vdf, PxVdf other, boolean override);
+	void pxVfsDestroy(PxVfs vdf);
 
-	Pointer pxVdfGetEntryByName(PxVdf vdf, String name);
+	PxVfsNode pxVfsGetNodeByName(PxVfs vdf, String name);
 
-	PxBuffer pxVdfEntryOpenBuffer(Pointer entry);
+	PxBuffer pxVfsNodeOpenBuffer(PxVfsNode node);
 
 	PxModelAnimation pxManLoad(PxBuffer buffer);
 
-	PxModelAnimation pxManLoadFromVdf(PxVdf vdf, String name);
+	PxModelAnimation pxManLoadFromVfs(PxVfs vdf, String name);
 
 	void pxManDestroy(PxModelAnimation man);
 
@@ -52,13 +52,15 @@ public interface PhoenixNative extends Library {
 
 	int pxManGetChecksum(PxModelAnimation man);
 
+	int pxManGetSampleCount(PxModelAnimation man);
+
 	void pxManGetSample(PxModelAnimation man, int index, PxVec3 position, PxQuat rotation);
 
 	Pointer pxManGetNodeIndices(PxModelAnimation man, int[] length);
 
 	PxCutsceneLib pxCslLoad(PxBuffer buffer);
 
-	PxCutsceneLib pxCslLoadFromVdf(PxVdf vdf, String name);
+	PxCutsceneLib pxCslLoadFromVfs(PxVfs vdf, String name);
 
 	void pxCslDestroy(PxCutsceneLib csl);
 
@@ -66,17 +68,33 @@ public interface PhoenixNative extends Library {
 
 	PxDaedalusScript pxScriptLoad(PxBuffer buffer);
 
-	PxDaedalusScript pxScriptLoadFromVdf(PxVdf vdf, String name);
+	PxDaedalusScript pxScriptLoadFromVfs(PxVfs vdf, String name);
+
+	void pxScriptEnumerateSymbols(PxDaedalusScript script, PxDaedalusEnumerateCallback cb);
+
+	byte pxScriptGetInstruction(PxDaedalusScript script, int ip, PxDaedalusInstruction info);
+
+	String pxScriptSymbolGetName(PxDaedalusSymbol sym);
+
+	void pxScriptSymbolGetInfo(PxDaedalusSymbol sym, PxDaedalusSymbolInfo info);
+
+	int pxScriptSymbolGetInt(PxDaedalusSymbol sym, int offset);
+
+	float pxScriptSymbolGetFloat(PxDaedalusSymbol sym, int offset);
+
+	String pxScriptSymbolGetString(PxDaedalusSymbol sym, int offset);
 
 	void pxScriptDestroy(PxDaedalusScript world);
 
-	Pointer pxScriptGetSymbolById(PxDaedalusScript script, int id);
+	PxDaedalusSymbol pxScriptGetSymbolById(PxDaedalusScript script, int id);
 
-	Pointer pxScriptGetSymbolByName(PxDaedalusScript script, String name);
+	PxDaedalusSymbol pxScriptGetSymbolByAddress(PxDaedalusScript script, int address);
+
+	PxDaedalusSymbol pxScriptGetSymbolByName(PxDaedalusScript script, String name);
 
 	PxFont pxFntLoad(PxBuffer buffer);
 
-	PxFont pxFntLoadFromVdf(PxVdf vdf, String name);
+	PxFont pxFntLoadFromVfs(PxVfs vdf, String name);
 
 	void pxFntDestroy(PxFont fnt);
 
@@ -138,13 +156,13 @@ public interface PhoenixNative extends Library {
 
 	PxMesh pxMshLoad(PxBuffer buffer);
 
-	PxMesh pxMshLoadFromVdf(PxVdf vdf, String name);
+	PxMesh pxMshLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMshDestroy(PxMesh msh);
 
 	String pxMshGetName(PxMesh msh);
 
-	PxAABB pxMshGetBbox(PxMesh msh);
+	PxAABB.ByValue pxMshGetBbox(PxMesh msh);
 
 	int PxMshGetMaterialCount(PxMesh msh);
 
@@ -166,7 +184,7 @@ public interface PhoenixNative extends Library {
 
 	PxModel pxMdlLoad(PxBuffer buffer);
 
-	PxModel pxMdlLoadFromVdf(PxVdf vdf, String name);
+	PxModel pxMdlLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMdlDestroy(PxModel mdl);
 
@@ -176,7 +194,7 @@ public interface PhoenixNative extends Library {
 
 	PxModelHierarchy pxMdhLoad(PxBuffer buffer);
 
-	PxModelHierarchy pxMdhLoadFromVdf(PxVdf vdf, String name);
+	PxModelHierarchy pxMdhLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMdhDestroy(PxModelHierarchy mdl);
 
@@ -190,11 +208,11 @@ public interface PhoenixNative extends Library {
 
 	int pxMdhGetNodeCount(PxModelHierarchy mdh);
 
-	void pxMdhGetNode(PxModelHierarchy mdh, int index, short[] parent, String[] name);
+	void pxMdhGetNode(PxModelHierarchy mdh, int index, short[] parent, String[] name, PxMat4x4 transform);
 
 	PxModelMesh pxMdmLoad(PxBuffer buffer);
 
-	PxModelMesh pxMdmLoadFromVdf(PxVdf vdf, String name);
+	PxModelMesh pxMdmLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMdmDestroy(PxModelMesh mdm);
 
@@ -222,13 +240,170 @@ public interface PhoenixNative extends Library {
 
 	PxModelScript pxMdsLoad(PxBuffer buffer);
 
-	PxModelScript pxMdsLoadFromVdf(PxVdf vdf, String name);
+	PxModelScript pxMdsLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMdsDestroy(PxModelScript mds);
 
+	String pxMdsGetSkeletonName(PxModelScript mds);
+
+	boolean pxMdsGetSkeletonDisableMesh(PxModelScript mds);
+
+	int pxMdsGetMeshCount(PxModelScript mds);
+
+	String pxMdsGetMesh(PxModelScript mds, int i);
+
+	int pxMdsGetDisabledAnimationsCount(PxModelScript mds);
+
+	String pxMdsGetDisabledAnimation(PxModelScript mds, int i);
+
+	int pxMdsGetModelTagCount(PxModelScript mds);
+
+	String pxMdsGetModelTagBone(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationCombinationCount(PxModelScript mds);
+
+	String pxMdsGetAnimationCombinationName(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationCombinationLayer(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationCombinationNext(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationCombinationBlendIn(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationCombinationBlendOut(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationCombinationFlags(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationCombinationModel(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationCombinationLastFrame(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationBlendingCount(PxModelScript mds);
+
+	String pxMdsGetAnimationBlendingName(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationBlendingNext(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationBlendingBlendIn(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationBlendingBlendOut(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationAliasCount(PxModelScript mds);
+
+	String pxMdsGetAnimationAliasName(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationAliasLayer(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationAliasNext(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationAliasBlendIn(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationAliasBlendOut(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationAliasFlags(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationAliasAlias(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationAliasDirection(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationCount(PxModelScript mds);
+
+	String pxMdsGetAnimationName(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationLayer(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationNext(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationBlendIn(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationBlendOut(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationFlags(PxModelScript mds, int i);
+
+	String pxMdsGetAnimationModel(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationDirection(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationFirstFrame(PxModelScript mds, int i);
+
+	int pxMdsGetAnimationLastFrame(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationFps(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationSpeed(PxModelScript mds, int i);
+
+	float pxMdsGetAnimationCollisionVolumeScale(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventTagCount(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventTagFrame(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	int pxMdsGetAnimation_EventTagType(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	String pxMdsGetAnimation_EventTagSlot(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	String pxMdsGetAnimation_EventTagSlot2(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	String pxMdsGetAnimation_EventTagItem(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	int pxMdsGetAnimation_EventTagFrames(PxModelScript mds, int animIndex, int eventTagIndex, int size);
+
+	int pxMdsGetAnimation_EventTagFightMode(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	boolean pxMdsGetAnimation_EventTagAttached(PxModelScript mds, int animIndex, int eventTagIndex);
+
+	int pxMdsGetAnimation_EventPfxCount(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventPfxFrame(PxModelScript mds, int animIndex, int eventIndex);
+
+	int pxMdsGetAnimation_EventPfxIndex(PxModelScript mds, int animIndex, int eventIndex);
+
+	String pxMdsGetAnimation_EventPfxName(PxModelScript mds, int animIndex, int eventIndex);
+
+	String pxMdsGetAnimation_EventPfxPosition(PxModelScript mds, int animIndex, int eventIndex);
+
+	boolean pxMdsGetAnimation_EventPfxAttached(PxModelScript mds, int animIndex, int eventIndex);
+
+	int pxMdsGetAnimation_EventPfxStopCount(PxModelScript mds, int i);
+
+	void pxMdsGetAnimation_EventPfxStop(PxModelScript mds, int animIndex, int pfxStopIndex, int frame, int index);
+
+	int pxMdsGetAnimation_EventSfxCount(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventSfxFrame(PxModelScript mds, int animIndex, int sfxIndex);
+
+	String pxMdsGetAnimation_EventSfxName(PxModelScript mds, int animIndex, int sfxIndex);
+
+	float pxMdsGetAnimation_EventSfxRange(PxModelScript mds, int animIndex, int sfxIndex);
+
+	boolean pxMdsGetAnimation_EventSfxEmptySlot(PxModelScript mds, int animIndex, int sfxIndex);
+
+	int pxMdsGetAnimationEventSfxGroundCount(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventSfxGroundFrame(PxModelScript mds, int animIndex, int sfxIndex);
+
+	String pxMdsGetAnimation_EventSfxGroundName(PxModelScript mds, int animIndex, int sfxIndex);
+
+	float pxMdsGetAnimation_EventSfxGroundRange(PxModelScript mds, int animIndex, int sfxIndex);
+
+	boolean pxMdsGetAnimation_EventSfxGroundEmptySlot(PxModelScript mds, int animIndex, int sfxIndex);
+
+	int pxMdsGetAnimation_EventMorphAnimateCount(PxModelScript mds, int i);
+
+	int pxMdsGetAnimation_EventMorphAnimateFrame(PxModelScript mds, int animIndex, int morphIndex);
+
+	String pxMdsGetAnimation_EventMorphAnimateAnimation(PxModelScript mds, int animIndex, int morphIndex);
+
+	String pxMdsGetAnimation_EventMorphAnimateNode(PxModelScript mds, int animIndex, int morphIndex);
+
+	int pxMdsGetAnimation_EventCameraTremorCount(PxModelScript mds, int i);
+
+	void pxMdsGetAnimation_EventCameraTremor(PxModelScript mds, int animIndex, int tremorIndex, int frame, int field1,
+											 int field2, int field3, int field4);
+
 	PxMorphMesh pxMmbLoad(PxBuffer buffer);
 
-	PxMorphMesh pxMmbLoadFromVdf(PxVdf vdf, String name);
+	PxMorphMesh pxMmbLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMmbDestroy(PxMorphMesh mmb);
 
@@ -268,7 +443,7 @@ public interface PhoenixNative extends Library {
 
 	PxMultiResolutionMesh pxMrmLoad(PxBuffer buffer);
 
-	PxMultiResolutionMesh pxMrmLoadFromVdf(PxVdf vdf, String name);
+	PxMultiResolutionMesh pxMrmLoadFromVfs(PxVfs vdf, String name);
 
 	void pxMrmDestroy(PxMultiResolutionMesh mrm);
 
@@ -290,7 +465,7 @@ public interface PhoenixNative extends Library {
 
 	int pxMrmGetAlphaTest(PxMultiResolutionMesh mrm);
 
-	PxAABB pxMrmGetBbox(PxMultiResolutionMesh mrm);
+	PxAABB.ByValue pxMrmGetBbox(PxMultiResolutionMesh mrm);
 
 	PxMaterial pxMrmSubMeshGetMaterial(PxMultiResolutionSubMesh sub);
 
@@ -324,7 +499,7 @@ public interface PhoenixNative extends Library {
 
 	PxTexture pxTexLoad(PxBuffer buffer);
 
-	PxTexture pxTexLoadFromVdf(PxVdf vdf, String name);
+	PxTexture pxTexLoadFromVfs(PxVfs vdf, String name);
 
 	PxTexture pxTexDestroy(PxTexture tex);
 
@@ -332,9 +507,13 @@ public interface PhoenixNative extends Library {
 
 	Pointer pxTexGetMipmap(PxTexture tex, int level, int[] width, int[] height);
 
+	Pointer pxTexGetDecompressedMipmap(PxTexture tex, int level, int[] width, int[] height);
+
+	void pxTexFreeDecompressedMipmap(Pointer tex);
+
 	PxVm pxVmLoad(PxBuffer buffer);
 
-	PxVm pxVmLoadFromVdf(PxVdf vdf, String name);
+	PxVm pxVmLoadFromVfs(PxVfs vdf, String name);
 
 	void pxVmDestroy(PxVm vm);
 
@@ -382,9 +561,21 @@ public interface PhoenixNative extends Library {
 
 	boolean pxVmCallFunctionByIndex(PxVm vm, int index, String args, Object... o);
 
-	PxVmInstance pxVmInstanceAllocate(PxVm vm, String name, int type);
+	PxVmInstance pxVmInstanceAllocateByName(PxVm vm, String name, int type);
 
-	PxVmInstance pxVmInstanceInitialize(PxVm vm, String name, int type, PxVmInstance existing);
+	PxVmInstance pxVmInstanceAllocateByIndex(PxVm vm, int index, int type);
+
+	PxVmInstance pxVmInstanceInitializeByIndex(PxVm vm, String name, int type, PxVmInstance existing);
+
+	PxVmInstance pxVmInstanceInitializeByName(PxVm vm, int index, int type, PxVmInstance existing);
+
+	int pxVmInstanceGetSymbolIndex(PxVmInstance instance);
+
+	void pxVmPrintStackTrace(PxVm vm);
+
+	void pxVmEnumerateInstancesByClassName(PxVm vm, String name, PxVmEnumerateInstancesCallback cb);
+
+	int pxVmInstanceNpcGetId(PxVmInstance instance);
 
 	int pxVmInstanceNpcGetNameLength(PxVmInstance instance);
 
@@ -392,9 +583,147 @@ public interface PhoenixNative extends Library {
 
 	int pxVmInstanceNpcGetRoutine(PxVmInstance instance);
 
+	int pxVmInstanceItemGetId(PxVmInstance instance);
+
+	String pxVmInstanceItemGetName(PxVmInstance instance);
+
+	String pxVmInstanceItemGetNameId(PxVmInstance instance);
+
+	int pxVmInstanceItemGetHp(PxVmInstance instance);
+
+	int pxVmInstanceItemGetHpMax(PxVmInstance instance);
+
+	int pxVmInstanceItemGetMainFlag(PxVmInstance instance);
+
+	int pxVmInstanceItemGetFlags(PxVmInstance instance);
+
+	int pxVmInstanceItemGetWeight(PxVmInstance instance);
+
+	int pxVmInstanceItemGetValue(PxVmInstance instance);
+
+	int pxVmInstanceItemGetDamageType(PxVmInstance instance);
+
+	int pxVmInstanceItemGetDamageTotal(PxVmInstance instance);
+
+	int pxVmInstanceItemGetDamageLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetDamage(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetWear(PxVmInstance instance);
+
+	int pxVmInstanceItemGetProtectionLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetProtection(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetNutrition(PxVmInstance instance);
+
+	int pxVmInstanceItemGetCondAtrLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetCondAtr(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetCondValueLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetCondValue(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetChangeAtrLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetChangeAtr(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetChangeValueLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetChangeValue(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetMagic(PxVmInstance instance);
+
+	int pxVmInstanceItemGetOnEquip(PxVmInstance instance);
+
+	int pxVmInstanceItemGetOnUnequip(PxVmInstance instance);
+
+	int pxVmInstanceItemGetOnStateLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetOnState(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetOwner(PxVmInstance instance);
+
+	int pxVmInstanceItemGetOwnerGuild(PxVmInstance instance);
+
+	int pxVmInstanceItemGetDisguiseGuild(PxVmInstance instance);
+
+	String pxVmInstanceItemGetVisual(PxVmInstance instance);
+
+	String pxVmInstanceItemGetVisualChange(PxVmInstance instance);
+
+	String pxVmInstanceItemGetEffect(PxVmInstance instance);
+
+	int pxVmInstanceItemGetVisualSkin(PxVmInstance instance);
+
+	String pxVmInstanceItemGetSchemeName(PxVmInstance instance);
+
+	int pxVmInstanceItemGetMaterial(PxVmInstance instance);
+
+	int pxVmInstanceItemGetMunition(PxVmInstance instance);
+
+	int pxVmInstanceItemGetSpell(PxVmInstance instance);
+
+	int pxVmInstanceItemGetRange(PxVmInstance instance);
+
+	int pxVmInstanceItemGetMagCircle(PxVmInstance instance);
+
+	String pxVmInstanceItemGetDescription(PxVmInstance instance);
+
+	int pxVmInstanceItemGetTextLength(PxVmInstance instance);
+
+	String pxVmInstanceItemGetText(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetCountLength(PxVmInstance instance);
+
+	int pxVmInstanceItemGetCount(PxVmInstance instance, int i);
+
+	int pxVmInstanceItemGetInvZbias(PxVmInstance instance);
+
+	int pxVmInstanceItemGetInvRotX(PxVmInstance instance);
+
+	int pxVmInstanceItemGetInvRotY(PxVmInstance instance);
+
+	int pxVmInstanceItemGetInvRotZ(PxVmInstance instance);
+
+	int pxVmInstanceItemGetInvAnimate(PxVmInstance instance);
+
+	String pxVmInstanceSfxGetFile(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetPitchOff(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetPitchVar(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetVol(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetLoop(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetLoopStartOffset(PxVmInstance instance);
+
+	int pxVmInstanceSfxGetLoopEndOffset(PxVmInstance instance);
+
+	float pxVmInstanceSfxGetReverbLevel(PxVmInstance instance);
+
+	String pxVmInstanceSfxGetPfxName(PxVmInstance instance);
+
+	String pxVmInstanceMusicGetFile(PxVmInstance instance);
+
+	float pxVmInstanceMusicGetVol(PxVmInstance instance);
+
+	int pxVmInstanceMusicGetLoop(PxVmInstance instance);
+
+	float pxVmInstanceMusicGetReverbMix(PxVmInstance instance);
+
+	float pxVmInstanceMusicGetReverbTime(PxVmInstance instance);
+
+	int pxVmInstanceMusicGetTransitionType(PxVmInstance instance);
+
+	int pxVmInstanceMusicGetTransitionSubType(PxVmInstance instance);
+
 	PxWorld pxWorldLoad(PxBuffer buffer);
 
-	PxWorld pxWorldLoadFromVdf(PxVdf vdf, String name);
+	PxWorld pxWorldLoadFromVfs(PxVfs vdf, String name);
 
 	void pxWorldDestroy(PxWorld world);
 
@@ -416,6 +745,12 @@ public interface PhoenixNative extends Library {
 	int pxVobGetType(PxVob vob);
 
 	int pxVobGetId(PxVob vob);
+
+	PxAABB.ByValue pxVobGetBbox(PxVob vob);
+
+	PxVec3.ByValue pxVobGetPosition(PxVob vob);
+
+	PxMat3x3.ByValue pxVobGetRotation(PxVob vob);
 
 	boolean pxVobGetShowVisual(PxVob vob);
 
@@ -453,6 +788,219 @@ public interface PhoenixNative extends Library {
 
 	PxVob pxVobGetChild(PxVob vob, int i);
 
+	boolean pxVobGetGetHasDecal(PxVob vob);
+
+	String pxVobGetDecalName(PxVob vob);
+
+	PxVec2 pxVobGetDecalDimension(PxVob vob);
+
+	PxVec2 pxVobGetDecalOffset(PxVob vob);
+
+	boolean pxVobGetDecalTwoSided(PxVob vob);
+
+	int pxVobGetDecalAlphaFunc(PxVob vob);
+
+	float pxVobGetDecalTextureAnimFps(PxVob vob);
+
+	byte pxVobGetDecalAlphaWeight(PxVob vob);
+
+	boolean pxVobGetDecalIgnoreDaylight(PxVob vob);
+
+	String pxVobItemGetInstance(PxVobItem item);
+
+	String pxVobMobGetName(PxVobMob mob);
+
+	int pxVobMobGetHp(PxVobMob mob);
+
+	int pxVobMobGetDamage(PxVobMob mob);
+
+	boolean pxVobMobGetMovable(PxVobMob mob);
+
+	boolean pxVobMobGetTakable(PxVobMob mob);
+
+	boolean pxVobMobGetFocusOverride(PxVobMob mob);
+
+	int pxVobMobGetMaterial(PxVobMob mob);
+
+	String pxVobMobGetVisualDestroyed(PxVobMob mob);
+
+	String pxVobMobGetOwner(PxVobMob mob);
+
+	String pxVobMobGetOwnerGuild(PxVobMob mob);
+
+	boolean pxVobMobGetDestroyed(PxVobMob mob);
+
+	int pxVobMobInterGetState(PxVobMobInter mobInter);
+
+	String pxVobMobInterGetTarget(PxVobMobInter mobInter);
+
+	String pxVobMobInterGetItem(PxVobMobInter mobInter);
+
+	String pxVobMobInterGetConditionFunction(PxVobMobInter mobInter);
+
+	String pxVobMobInterGetOnStateChangeFunction(PxVobMobInter mobInter);
+
+	boolean pxVobMobInterGetRewind(PxVobMobInter mobInter);
+
+	String pxVobMobFireGetSlot(PxVobMobFire mobFire);
+
+	String pxVobMobFireGetVobTree(PxVobMobFire mobFire);
+
+	boolean pxVobMobContainerGetLocked(PxVobMobContainer mobContainer);
+
+	String pxVobMobContainerGetKey(PxVobMobContainer mobContainer);
+
+	String pxVobMobContainerGetPickString(PxVobMobContainer mobContainer);
+
+	String pxVobMobContainerGetContents(PxVobMobContainer mobContainer);
+
+	boolean pxVobMobDoorGetLocked(PxVobMobDoor mobDoor);
+
+	String pxVobMobDoorGetKey(PxVobMobDoor mobDoor);
+
+	String pxVobMobDoorGetPickString(PxVobMobDoor mobDoor);
+
+	float pxVobSoundGetVolume(PxVobSound sound);
+
+	int pxVobSoundGetSoundMode(PxVobSound sound);
+
+	float pxVobSoundGetRandomDelay(PxVobSound sound);
+
+	float pxVobSoundGetRandomDelayVar(PxVobSound sound);
+
+	boolean pxVobSoundGetInitiallyPlaying(PxVobSound sound);
+
+	boolean pxVobSoundGetAmbient3d(PxVobSound sound);
+
+	boolean pxVobSoundGetObstruction(PxVobSound sound);
+
+	float pxVobSoundGetConeAngle(PxVobSound sound);
+
+	int pxVobSoundGetSoundTriggerVolume(PxVobSound sound);
+
+	float pxVobSoundGetRadius(PxVobSound sound);
+
+	String pxVobSoundGetSoundName(PxVobSound sound);
+
+	float pxVobSoundDaytimeStartTime(PxVobSoundDaytime soundDaytime);
+
+	float pxVobSoundDaytimeEndTime(PxVobSoundDaytime soundDaytime);
+
+	String pxVobSoundDaytimeSoundName2(PxVobSoundDaytime soundDaytime);
+
+	String pxVobTriggerGetTarget(PxVobTrigger trigger);
+
+	byte pxVobTriggerGetFlags(PxVobTrigger trigger);
+
+	byte pxVobTriggerGetFilterFlags(PxVobTrigger trigger);
+
+	String pxVobTriggerGetVobTarget(PxVobTrigger trigger);
+
+	int pxVobTriggerGetMaxActivationCount(PxVobTrigger trigger);
+
+	float pxVobTriggerGetRetriggerDelaySec(PxVobTrigger trigger);
+
+	float pxVobTriggerGetDamageThreshold(PxVobTrigger trigger);
+
+	float pxVobTriggerGetFireDelaySec(PxVobTrigger trigger);
+
+	float pxVobTriggerGetSNextTimeTriggerable(PxVobTrigger trigger);
+
+	int pxVobTriggerGetSCountCanBeActivated(PxVobTrigger trigger);
+
+	boolean pxVobTriggerGetSIsEnabled(PxVobTrigger trigger);
+
+	int pxVobTriggerMoverGetBehaviour(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetTouchBlockerDamage(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetStayOpenTimeSec(PxVobTriggerMover trigger);
+
+	boolean pxVobTriggerMoverGetLocked(PxVobTriggerMover trigger);
+
+	boolean pxVobTriggerMoverGetAutoLink(PxVobTriggerMover trigger);
+
+	boolean pxVobTriggerMoverGetAutoRotate(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetSpeed(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetLerpMode(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetSpeedMode(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetKeyframeCount(PxVobTriggerMover trigger);
+
+	void pxVobTriggerMoverGetKeyframe(PxVobTriggerMover trigger, int i, PxVec3 position, PxQuat rotation);
+
+	String pxVobTriggerMoverGetSfxOpenStart(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxOpenEnd(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxTransitioning(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxCloseStart(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxCloseEnd(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxLock(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxUnlock(PxVobTriggerMover trigger);
+
+	String pxVobTriggerMoverGetSfxUseLocked(PxVobTriggerMover trigger);
+
+	PxVec3 pxVobTriggerMoverGetSActKeyPosDelta(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetSActKeyframeF(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetSActKeyframe(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetSNextKeyFrame(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetMoveSpeedUnit(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetSAdvanceDir(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetSMoverState(PxVobTriggerMover trigger);
+
+	int pxVobTriggerMoverGetSTriggerEventCount(PxVobTriggerMover trigger);
+
+	float pxVobTriggerMoverGetSStayOpenTimeDest(PxVobTriggerMover trigger);
+
+	int pxVobTriggerListGetTriggerBatchMode(PxVobTriggerList trigger);
+
+	int pxVobTriggerListGetTargetsCount(PxVobTriggerList trigger);
+
+	String pxVobTriggerListGetTargetName(PxVobTriggerList trigger, int i);
+
+	float pxVobTriggerListGetTargetDelay(PxVobTriggerList trigger, int i);
+
+	byte pxVobTriggerListGetSActTarget(PxVobTriggerList trigger);
+
+	boolean pxVobTriggerListGetSSendOnTrigger(PxVobTriggerList trigger);
+
+	String pxVobTriggerScriptGetFunction(PxVobTriggerScript trigger);
+
+	String pxVobTriggerChangeLevelGetLevelName(PxVobTriggerChangeLevel trigger);
+
+	String pxVobTriggerChangeLevelGetStartVob(PxVobTriggerChangeLevel trigger);
+
+	String pxVobTriggerWorldStartGetTarget(PxVobTriggerWorldStart trigger);
+
+	boolean pxVobTriggerWorldStartGetFireOnce(PxVobTriggerWorldStart trigger);
+
+	boolean pxVobTriggerWorldStartGetSHasFired(PxVobTriggerWorldStart trigger);
+
+	String pxVobTriggerUntouchGetTarget(PxVobTriggerUntouch trigger);
+
+	void pxWorldVobGetZoneMusic(PxVobZoneMusic zoneMusic, boolean[] enabled, int[] priority, boolean[] ellipsoid,
+								float[] reverb, float[] volume, boolean[] loop);
+
+	void pxWorldVobGetZoneFarPlane(PxVobZoneFarPlane zoneFarPlane, float[] vob_far_plane_z,
+								   float[] inner_range_percentage);
+
+	void pxWorldVobGetZoneFog(PxVobZoneFog zoneFog, float[] range_center, float[] inner_range_percentage, PxColor color,
+							  boolean[] fade_out_sky, boolean[] override_color);
+
 	interface LoggingFunc extends Callback {
 		void invoke(int level, String message);
 	}
@@ -463,5 +1011,13 @@ public interface PhoenixNative extends Library {
 
 	interface PxVmExternalDefaultCallback extends Callback {
 		void invoke(PxVm vm, String name);
+	}
+
+	interface PxDaedalusEnumerateCallback extends Callback {
+		boolean invoke(PxDaedalusScript script, PxDaedalusSymbol symbol);
+	}
+
+	interface PxVmEnumerateInstancesCallback extends Callback {
+		void invoke(String symbol);
 	}
 }
